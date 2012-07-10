@@ -30,12 +30,12 @@ namespace libmv {
  */
 class Feature {
  public:
-  virtual ~Feature();
+  virtual ~Feature() {};
 };
 
 class PointFeature : public Feature {
  public:
-  virtual ~PointFeature();
+  virtual ~PointFeature() {};
 
   PointFeature(float xx=0.0f, float yy=0.0f) {
     coords[0] = xx;
@@ -54,7 +54,7 @@ class PointFeature : public Feature {
 
 class LineFeature : public Feature {
  public:
-  virtual ~LineFeature();
+  virtual ~LineFeature() {};
   virtual const Vec2f &Point1() = 0;
   virtual const Vec2f &Point2() = 0;
 };

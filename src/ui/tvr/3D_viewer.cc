@@ -22,7 +22,11 @@
 
 #include <QtGui>
 #include <QtOpenGL>
-#include <GL/glu.h>
+#if defined(__APPLE__) && defined(__MACH__)
+#include <OpenGL/glu.h> /* Header File For The GLU Library */
+#else
+#include <GL/glu.h> /* Header File For The GLU Library */
+#endif
 
 using namespace libmv::scene;
 

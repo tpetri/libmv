@@ -31,7 +31,14 @@
 #include <QAction>
 #include <QMdiArea>
 #include <qgl.h>
-#include <GL/glu.h>
+
+#if defined(__APPLE__) && defined(__MACH__)
+#include <OpenGL/gl.h>  /* Header File For The OpenGL Library */
+#include <OpenGL/glu.h> /* Header File For The GLU Library */
+#else
+#include <GL/gl.h>  /* Header File For The OpenGL Library */
+#include <GL/glu.h> /* Header File For The GLU Library */
+#endif
 
 #include "ui/tvr/features.h"
 #include "ui/tvr/tvr_document.h"
