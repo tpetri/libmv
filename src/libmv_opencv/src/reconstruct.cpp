@@ -56,6 +56,7 @@ using namespace std;
 
 namespace cv
 {
+#if 0
   void
   ptvec2mat(std::vector<cv::Point2d> &pvec, cv::Mat &pmat)
   {
@@ -100,20 +101,6 @@ namespace cv
 
   }
 
-  void
-  recon_2_projmatvec(libmv::Reconstruction& recon, OutputArrayOfArrays Pv)
-  {
-    libmv::PinholeCamera *cam;
-
-    for (int m = 0; m < recon.GetNumberCameras(); ++m)
-    {
-      cam = (PinholeCamera *) recon.GetCamera(m);
-      cv::Mat P;
-      eigen2cv(cam->GetPoseMatrix(), P);
-      P.copyTo(Pv.getMatRef(m));
-    }
-  }
-
   /* Converts 2d vector of points to 2xN Mat */
   void
   ptvec2d_2_mat(std::vector<cv::Point2d> ptvec2d, cv::Mat& mat)
@@ -125,6 +112,41 @@ namespace cv
       mat.at<double>(1, n) = ptvec2d[n].y;
     }
   }
+#endif
+
+  /*  Build libmv matches from input points2d*/
+  void
+  points2d_2_matches(const std::vector<cv::Mat> & pts2d, libmv::Matches& matches)
+  {
+    for (int m = 0; m < pts2d.size(); ++m)
+    {
+      for (int n = 0; n < pts2d[m].cols; ++n)
+      {
+        PointFeature * feature;
+        if (pts2d[m].depth() == CV_32F)
+          feature = new PointFeature(pts2d[m].at<float >(0, n), pts2d[m].at<float>(0, n));
+        else
+          feature = new PointFeature(pts2d[m].at<double>(0, n), pts2d[m].at<double>(0, n));
+        matches.Insert(m, n, feature);
+      }
+    }
+
+  }
+
+  /*  Builds projection matrix array from libmv Reconstruction*/
+  void
+  recon_2_projmatvec(libmv::Reconstruction& recon, OutputArrayOfArrays Pv, int depth)
+  {
+    libmv::PinholeCamera *cam;
+
+    for (int m = 0; m < recon.GetNumberCameras(); ++m)
+    {
+      cam = dynamic_cast<PinholeCamera *>(recon.GetCamera(m));
+      cv::Mat P;
+      eigen2cv(cam->projection_matrix(), P);
+      P.convertTo(Pv.getMatRef(m), depth);
+    }
+  }
 
   /* reconstruction function for API */
   void
@@ -132,9 +154,14 @@ namespace cv
               bool is_projective, bool has_outliers, bool is_sequence)
   {
 
+    int nviews = points2d.total();
+
     /* OpenCV data types */
     bool result = false;
     std::vector<std::vector<Point2d> > _points2d;
+    std::vector<cv::Mat> pts2d;
+    points2d.getMatVector(pts2d);
+    int depth = pts2d[0].depth();
 
     /* Data types needed by libmv functions */
     Matches matches;
@@ -142,11 +169,7 @@ namespace cv
     Reconstruction recon;
 
     /* Convert OpenCV types to libmv types */
-    iparr_2_ptvec(points2d, _points2d);
-    ptvec_2_matches(_points2d, matches);
-
-    int nviews = _points2d.size();
-    // cout << nviews << endl;
+    points2d_2_matches(pts2d, matches);
 
     /* Projective reconstruction*/
 
@@ -156,27 +179,48 @@ namespace cv
       /* Two view reconstruction */
 
       if (nviews == 2)
+      {
         result = ReconstructFromTwoUncalibratedViews(matches, 0, 1, &matches_inliers, &recon);
 
-      /* Get projection matrices */
+        /* Get projection matrices */
 
-      CV_Assert(recon.GetNumberCameras() == nviews);
-      projection_matrices.create(1, nviews, 0, -1, true, 0);
-      recon_2_projmatvec(recon, projection_matrices);
+        CV_Assert(recon.GetNumberCameras() == nviews);
+        projection_matrices.create(1, nviews, 0, -1, true, 0);
+        recon_2_projmatvec(recon, projection_matrices, depth);
 
-      /* Triangulate and find 3D points */
+        /* Triangulate and find 3D points */
 
-      triangulatePoints(points2d, projection_matrices, points3d);
+        triangulatePoints(points2d, projection_matrices, points3d);
+      }
 
     }
+
     /* Euclidian reconstruction*/
+
     else
     {
 
+      /* Two view reconstruction */
+
+      if (nviews == 2)
+      {
+        result = ReconstructFromTwoUncalibratedViews(matches, 0, 1, &matches_inliers, &recon);
+
+        /* Get projection matrices */
+
+        CV_Assert(recon.GetNumberCameras() == nviews);
+        projection_matrices.create(1, nviews, 0 /*type*/, -1, true, 0);
+        recon_2_projmatvec(recon, projection_matrices, depth);
+
+        /* Triangulate and find 3D points */
+
+        triangulatePoints(points2d, projection_matrices, points3d);
+      }
+
     }
 
-    /* Give error if reconstruction failed */
-//    CV_Assert(result == true);
+    /* Assert if reconstruction succeeded */
+    CV_Assert(result == true);
   }
 
 }

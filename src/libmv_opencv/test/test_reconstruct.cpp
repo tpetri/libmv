@@ -39,51 +39,68 @@ using namespace cv;
 using namespace std;
 using namespace cvtest;
 
+/* Check projection errors */
+void
+check_projection_errors(const Mat& points3d_estimated, const vector<Mat>& projection_matrices_estimated,
+                        const vector<Mat>& points2d)
+{
+  Mat X;
+  EuclideanToHomogeneous(points3d_estimated, X); // 3D point
+  for (int m = 0; m < points2d.size(); ++m)
+  {
+    Mat x;
+    HomogeneousToEuclidean(projection_matrices_estimated[m] * X, x); // 2d projection
+    Mat projerr = points2d[m] - x;
+//    cout << projerr << endl;
+    for (int n = 0; n < projerr.cols; ++n)
+    {
+      double d = cv::norm(projerr.col(n));
+      EXPECT_NEAR(0, d, 1e-4);
+    }
+  }
+}
+
 TEST(Sfm_reconstruct, twoViewProjective)
 {
-  vector<Point3d> points3d;
-  vector<Point3d> points3d_estimated;
-  vector<Mat> projection_matrices;
-  vector<Mat> projection_matrices_estimated;
-  vector<vector<Point2d> > points2d;
+  int nviews = 2;
+  int npoints = 50;
+  bool is_projective = true;
 
-  string filename(cvtest::TS::ptr()->get_data_path() + "sfm/rnd_N10_F3.yml");
-
-  cout << "Test data: " << filename << endl;
-  readtestdata(filename, 2, 10, points2d);
-  readtestdata(filename, 2, projection_matrices);
-  readtestdata(filename, points3d);
-  CV_Assert(points3d.size()==10);
-
-  cout << "Ground truth 3D Points:" << endl;
-  for (int n = 0; n < points3d.size(); ++n)
-    cout << points3d[n] << endl;
-
-/*
-  reconstruct(points2d, projection_matrices_estimated, points3d_estimated, true);
-
-  cout << "Groundtruth Projection Matrices:" << endl;
-  cout << projection_matrices[0] << endl;
-  cout << projection_matrices[1] << endl;
-  cout << "Estimate Projection Matrices :" << endl;
-  cout << projection_matrices_estimated[0] << endl;
-  cout << projection_matrices_estimated[1] << endl;
-  cout << "Not necessarily equal.Better to check diff in x=PX" << endl;
-  cout << "Ground truth 3D Points:" << endl;
-  for (int n = 0; n < points3d.size(); ++n)
-    cout << points3d[n] << endl;
-
-  cout << "Estimted 3D Points:" << endl;
-  for (int n = 0; n < points3d.size(); ++n)
-    cout << points3d_estimated[n] << endl;
-*/
-
-  /* Check x=PX -- improve */
-/*  vector<Point2d> v1pts2d = points2d[0];
-  for (int n = 0; n < points3d.size(); ++n)
+  for(unsigned iter =0;iter<2;++iter)
   {
-    cout << "View 1Projection error for pt " << n << ": "
-         << v1pts2d[n] - projection_matrices_estimated[0] * points3d_estimated[n];
-  }*/
+    int depth;
+    float err_max2d, err_max3d;
+    if (iter==0)
+    {
+      depth = CV_32F;
+      err_max2d = 1e-5;
+      err_max3d = 1e-9;
+    }
+    else
+    {
+      depth = CV_64F;
+      err_max2d = 1e-7;
+      err_max3d = 1e-9;
+    }
 
+    cv::Mat K;
+    std::vector<cv::Mat> Rs;
+    std::vector<cv::Mat> ts;
+    std::vector<cv::Mat> Ps;
+    cv::Mat points3d;
+    std::vector<cv::Mat> points2d;
+    generateScene(nviews, npoints, is_projective, depth, K, Rs, ts, Ps, points3d, points2d);
+
+    Mat points3d_estimated;
+    vector<Mat> Ps_estimated;
+
+    reconstruct(points2d, Ps_estimated, points3d_estimated, is_projective);
+
+    /*  Check projection errors on GT*/
+    check_projection_errors(points3d, Ps, points2d);
+
+    /*  Check projection errors on estimates*/
+    // should this work for the  projective case??
+    check_projection_errors(points3d_estimated, Ps_estimated, points2d);
+  }
 }

@@ -1,10 +1,9 @@
-ADD_SUBDIRECTORY(mvr)
-
 LIBMV_INSTALL_ALL_HEADERS()
 
 
 find_package(OpenCV REQUIRED)
 
+include_directories(SYSTEM ${OpenCV_INCLUDE_DIRS})
 include_directories(include)
 
 add_library(opencv_sfm src/conditioning.cpp
@@ -13,12 +12,12 @@ add_library(opencv_sfm src/conditioning.cpp
                        src/triangulate.cpp
 )
 
-target_link_libraries(opencv_sfm ${OpenCV_LIBS}
-                                  ${OpenCV_LIBRARIES}
+target_link_libraries(opencv_sfm  ${OpenCV_LIBRARIES}
                                   reconstruction
                                   correspondence
                                   camera
-                                  multiview 
+                                  multiview
+                                  multiview_test_data
                                   numeric
 )
 
@@ -34,12 +33,13 @@ install(DIRECTORY include/opencv2/sfm
 # Add some tests
 include_directories(${GTEST_INCLUDE_DIRS})
 
-add_executable(sfm_tests test/test_main.cpp
+add_executable(sfm_tests test/scene.cpp
                          test/test_conditioning.cpp
-                         test/test_projection.cpp
-                      	 test/test_triangulate.cpp                         
-                         test/test_reconstruct.cpp
+                         test/test_main.cpp
                          test/test_precomp.cpp
+                         test/test_projection.cpp
+                         test/test_reconstruct.cpp
+                         test/test_triangulate.cpp
 )
 
 find_library(OPENCV_TS_LIBRARY opencv_ts ${OpenCV_LIB_DIR})
@@ -52,4 +52,4 @@ target_link_libraries(sfm_tests opencv_sfm
 set_target_properties(sfm_tests PROPERTIES
                       RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin/tests)
 
-add_test(sfm_tests sfm_tests)
+add_test(sfm_tests  ${PROJECT_BINARY_DIR}/bin/tests/sfm_tests)
