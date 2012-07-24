@@ -67,7 +67,7 @@ IF(MSVC)
 ENDIF(MSVC)
 
 # To build shared libs
-# OPTION(BUILD_SHARED_LIBS "Build dynamic shared libraries (.dll/.so)." OFF)
+OPTION(BUILD_SHARED_LIBS "Build dynamic shared libraries (.dll/.so)." OFF)
 
 INCLUDE(ConfigureBuild)
 
