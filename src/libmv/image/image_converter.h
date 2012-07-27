@@ -28,7 +28,7 @@ namespace libmv{
 // The factor comes from http://www.easyrgb.com/
 // RGB to XYZ : Y is the luminance channel
 // var_R * 0.2126 + var_G * 0.7152 + var_B * 0.0722
-
+template<class T>
 inline T RGB2GRAY(const T r,const T g, const T b)
 {
   const double d = r * 0.2126 + g * 0.7152 + b * 0.0722;
