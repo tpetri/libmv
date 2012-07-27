@@ -10,10 +10,10 @@ FILE(GLOB DESCRIPTOR_HDRS *.h)
 
 ADD_LIBRARY(descriptor ${DESCRIPTOR_SRC} ${DESCRIPTOR_HDRS})
 
-TARGET_LINK_LIBRARIES(descriptor)
+TARGET_LINK_LIBRARIES(descriptor gflags glog image daisy)
 
 # make the name of debug libraries end in _d.
 SET_TARGET_PROPERTIES(descriptor PROPERTIES DEBUG_POSTFIX "_d")
 
 LIBMV_INSTALL_LIB(descriptor)
-LIBMV_TEST(daisy_descriptor "descriptor;image;daisy")
+LIBMV_TEST(daisy_descriptor "descriptor;image;daisy;gflags;glog;")

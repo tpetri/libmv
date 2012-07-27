@@ -25,7 +25,8 @@ IF (WIN32)
 ENDIF (WIN32)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-  SET(CMAKE_CXX_FLAGS "-Wall -W -Wno-sign-compare -Wno-strict-aliasing")
+  # TODO(julienr): fPIC should be added only when building as shared lib
+  SET(CMAKE_CXX_FLAGS "-fPIC -Wall -W -Wno-sign-compare -Wno-strict-aliasing")
   ADD_DEFINITIONS(-D_GNU_SOURCE)
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 

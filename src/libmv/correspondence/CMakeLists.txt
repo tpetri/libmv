@@ -19,6 +19,8 @@ ADD_LIBRARY(correspondence ${CORRESPONDENCE_SRC} ${CORRESPONDENCE_HDRS})
 # make the name of debug libraries end in _d.
 SET_TARGET_PROPERTIES(correspondence PROPERTIES DEBUG_POSTFIX "_d")
 
+TARGET_LINK_LIBRARIES(correspondence multiview flann image numeric)
+
 # installation rules for the library
 LIBMV_INSTALL_LIB(correspondence)
             
