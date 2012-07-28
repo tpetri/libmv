@@ -9,7 +9,9 @@ ADD_SUBDIRECTORY(ldl)
 ADD_SUBDIRECTORY(ssba)
 ADD_SUBDIRECTORY(OpenExif)
 ADD_SUBDIRECTORY(zlib)
-ADD_SUBDIRECTORY(png)
+# Use the system libpng otherwise this create conflicts with other libs that
+# are linked with another libpng version
+#ADD_SUBDIRECTORY(png)
 
 IF(WIN32 OR APPLE)
   ADD_SUBDIRECTORY(jpeg-7)
