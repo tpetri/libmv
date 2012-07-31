@@ -10,9 +10,12 @@ ELSE (WIN32)
 ENDIF (WIN32)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
-  SET(CMAKE_CXX_FLAGS "")
+  SET(CMAKE_CXX_FLAGS "-fPIC")
   #  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused -Wno-type-limits -Wno-empty-body")
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
+
+# To build a DLL/so, add the following
+# ADD_DEFINITIONS("-DGOOGLE_GLOG_DLL_DECL=__declspec(dllexport) -DIS_DLL")
 
 IF (WIN32)
   ADD_LIBRARY(glog

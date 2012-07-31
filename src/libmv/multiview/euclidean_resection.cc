@@ -560,6 +560,7 @@ bool EuclideanResectionEPnP(const Mat2X &x_camera,
   } else {
     LOG(ERROR) << "First approximation of beta not good enough.";
     ts[0].setZero();
+    Rs[0].setIdentity();
     rmse(0) = std::numeric_limits<double>::max();
   }
  
@@ -593,6 +594,7 @@ bool EuclideanResectionEPnP(const Mat2X &x_camera,
   } else {
     LOG(ERROR) << "Second approximation of beta not good enough.";
     ts[1].setZero();
+    Rs[1].setIdentity();
     rmse(1) = std::numeric_limits<double>::max();
   }
   
@@ -632,13 +634,14 @@ bool EuclideanResectionEPnP(const Mat2X &x_camera,
   } else {
     LOG(ERROR) << "Third approximation of beta not good enough.";
     ts[2].setZero();
+    Rs[2].setIdentity();
     rmse(2) = std::numeric_limits<double>::max();
   }
   
   // Finally, with all three solutions, select the (R, t) with the best RMSE.
   VLOG(2) << "RMSE for solution 0: " << rmse(0);
-  VLOG(2) << "RMSE for solution 1: " << rmse(0);
-  VLOG(2) << "RMSE for solution 2: " << rmse(0);
+  VLOG(2) << "RMSE for solution 1: " << rmse(1);
+  VLOG(2) << "RMSE for solution 2: " << rmse(2);
   size_t n = 0;
   if (rmse(1) < rmse(0)) {
     n = 1;
@@ -654,6 +657,8 @@ bool EuclideanResectionEPnP(const Mat2X &x_camera,
   VLOG(1) << "RMSE for best solution #" << n << ": " << rmse(n);
   *R = Rs[n];
   *t = ts[n];
+  // TODO(julienr): If none of the approximation is good, might be a good
+  // idea to return false ?
 
   // TODO(julien): Improve the solutions with non-linear refinement.
   return true;

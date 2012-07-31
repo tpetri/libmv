@@ -76,10 +76,10 @@ CONFIGURE_FILE(
 ADD_CUSTOM_TARGET(uninstall
     COMMAND ${CMAKE_COMMAND} -P ${PROJECT_BINARY_DIR}/cmake_uninstall.cmake)
 
-INSTALL(FILES CMake/modules/FindLibmv.cmake
-        DESTINATION "${CMAKE_ROOT}/Modules/"
-        COMPONENT headers
-        PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
+#INSTALL(FILES CMake/modules/FindLibmv.cmake
+        #DESTINATION "${CMAKE_ROOT}/Modules/"
+        #COMPONENT headers
+        #PERMISSIONS OWNER_READ GROUP_READ WORLD_READ)
         
 INSTALL(FILES CMake/modules/FindLibmv.cmake
         DESTINATION ${LIBMV_SHARE_OUTPUT_DIR}/CMake/
