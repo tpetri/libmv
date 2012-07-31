@@ -38,7 +38,10 @@
 
 #ifdef __cplusplus
 
-#include <opencv2/core/core.hpp>
+#include <opencv2/sfm/conditioning.hpp>
+#include <opencv2/sfm/fundamental.hpp>
+#include <opencv2/sfm/numeric.hpp>
+#include <opencv2/sfm/projection.hpp>
 
 namespace cv
 {
@@ -48,10 +51,10 @@ namespace cv
   {
       CV_TRIANG_DLT = 0,         /*!< HZ 12.2 pag.312 */
       CV_TRIANG_ALGEBRAIC = 1,   /*!< ... */
-      CV_TRIANG_BY_PLANE = 2,
+      CV_TRIANG_BY_PLANE = 2,    /*!< Minimises the reprojection error */
   };
 
-  
+
   /** Triangulates the 3d position of 2d correspondences between several images
    * @param points2d a vector of vectors of 2d points (the inner vector is per image)
    * @param projection_matrices The 3 x 4 projections matrices of each image
@@ -62,6 +65,21 @@ namespace cv
   void
   triangulatePoints(InputArrayOfArrays points2d, InputArrayOfArrays projection_matrices,
                     OutputArray points3d, int method = CV_TRIANG_DLT);
+
+  /** Triangulates the 3d position of 2d correspondences between several images
+   * @param points2d a vector of vectors of 2d points (the inner vector is per image)
+   * @param K The 3x3 calibration matrix
+   * @param R The 3x3 rotation matrix
+   * @param t The 3x1 translation vector
+   * @param points3d the 3d points
+   * @param has_outliers if true, the correspondences are not trusted
+   */
+  CV_EXPORTS
+  void
+  triangulatePoints(InputArrayOfArrays points2d, InputArrayOfArrays K,
+                    InputArrayOfArrays R, InputArrayOfArrays t,
+                    OutputArray points3d, int method = CV_TRIANG_BY_PLANE);
+
 
   /** Reconstruct 3d points from 2d correspondences without performing autocalibration.
    * @param points2d a vector of vectors of 2d points (the inner vector is per image)
@@ -89,33 +107,24 @@ namespace cv
   CV_EXPORTS
   void
   reconstruct(InputArrayOfArrays points2d, OutputArrayOfArrays Rs, OutputArrayOfArrays Ts, OutputArray K,
-              OutputArray points3d, bool is_projective = false, bool has_outliers = false, bool is_sequence =
-                  false);
+              OutputArray points3d, bool is_projective = false, bool has_outliers = false, bool is_sequence = false);
 
-  /** Converts point coordinates from homogeneous to euclidean pixel coordinates. E.g., ((x,y,z)->(x/z, y/z))
-   * @param src Input vector of N-dimensional points
-   * @param dst Output vector of N-1-dimensional points.
+  /** Computes the fundamental matrix from corresponding points in two views
+   * @param x1 2xN Array of 2D points in view 1
+   * @param x2 2xN Array of 2D points in view 2
+   * @param F Output 3x3 Fundamental matrix such that x2^Fx1=0
    */
   CV_EXPORTS
   void
-  HomogeneousToEuclidean(InputArray src, OutputArray dst);
+  fundamental8Point(InputArray x1, InputArray x2, OutputArray F, bool has_outliers = true);
 
-  /** Converts points from Euclidean to homogeneous space. E.g., ((x,y)->(x,y,1))
-   * @param src Input vector of N-dimensional points
-   * @param dst Output vector of N+1-dimensional points.
+  /** Computes the skew matrix of a vector
+      Reference: HZ2, p581, equation (A4.5)
+   * @param s Input 3x1 vector
+   * @param S Output 3x3 skew symmetric matrix
    */
-  CV_EXPORTS
-  void
-  EuclideanToHomogeneous(InputArray src, OutputArray dst);
-  
-  /** This function normalizes points as done in the eight point algorithm
-   * @param X Input vector of N-dimensional points
-   * @param x Output vector of the same N-dimensional points but with mean 0 and average norm sqrt(2)
-   * @param T Output transform matrix such that x = T*X
-   */
-  CV_EXPORTS
-  void
-  IsotropicScaling(InputArray X, OutputArray x, OutputArray T);
+  void skew(InputArray s, OutputArray S);
+
 } /* namespace cv */
 
 #endif /* __cplusplus */

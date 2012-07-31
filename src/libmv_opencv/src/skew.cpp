@@ -33,52 +33,63 @@
  *
  */
 
-#include "test_precomp.hpp"
-#include "opencv2/sfm/sfm.hpp"
+#include <opencv2/sfm/sfm.hpp>
 
-using namespace cv;
-using namespace std;
-
-TEST(Sfm_homogeneousToEuclidean, correctness)
+namespace cv
 {
-    Matx33f X(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
 
-    Matx23f XEuclidean;
-    homogeneousToEuclidean(X,XEuclidean);
+  // Finds the skew matrix of a vector
+  // Reference: HZ2, p581, equation (A4.5)
+  void
+  skew(InputArray s_, OutputArray S)
+  {
+    cv::Mat s = s_.getMat();
+    cv::Mat A;
 
-    EXPECT_EQ( X.rows-1, XEuclidean.rows );
+    CV_Assert((s.type() == CV_64F) || (s.type() == CV_32F));
 
-    for(int y=0;y<X.rows-1;++y)
-        for(int x=0;x<X.cols;++x)
-            if (X(X.rows-1,x)!=0)
-                EXPECT_LE( std::abs(X(y,x)/X(X.rows-1, x) - XEuclidean(y,x)), 1e-4 );
+    // double
+    if (s.type() == CV_64F)
+    {
+      A.create(3, 3, CV_64F);
+      //    A=[0 -a(3) a(2); a(3) 0 -a(1); -a(2) a(1) 0];
+      A.at<double>(0, 0) = 0.0;
+      A.at<double>(0, 1) = -1.0 * s.at<double>(2, 0);
+      A.at<double>(0, 2) = s.at<double>(1, 0);
+
+      A.at<double>(1, 0) = s.at<double>(2, 0);
+      A.at<double>(1, 1) = 0.0;
+      A.at<double>(1, 2) = -1 * s.at<double>(0, 0);
+
+      A.at<double>(2, 0) = -1.0 * s.at<double>(1, 0);
+      A.at<double>(2, 1) = s.at<double>(1, 0);
+      A.at<double>(2, 2) = 0.0;
+
+    }
+
+    //float
+    else
+    {
+      A.create(3, 3, CV_32F);
+      //    A=[0 -a(3) a(2); a(3) 0 -a(1); -a(2) a(1) 0];
+      A.at<float>(0, 0) = 0.0;
+      A.at<float>(0, 1) = -1.0 * s.at<float>(2, 0);
+      A.at<float>(0, 2) = s.at<float>(1, 0);
+
+      A.at<float>(1, 0) = s.at<float>(2, 0);
+      A.at<float>(1, 1) = 0.0;
+      A.at<float>(1, 2) = -1 * s.at<float>(0, 0);
+
+      A.at<float>(2, 0) = -1.0 * s.at<float>(1, 0);
+      A.at<float>(2, 1) = s.at<float>(1, 0);
+      A.at<float>(2, 2) = 0.0;
+
+    }
+
+    // Pack output
+    A.copyTo(S.getMatRef());
+
+  }
+
 }
-
-TEST(Sfm_euclideanToHomogeneous, correctness)
-{
-    // Testing with floats
-    Matx33f x(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
-
-    Matx43f XHomogeneous;
-    euclideanToHomogeneous(x,XHomogeneous);
-
-    EXPECT_EQ( x.rows+1, XHomogeneous.rows );
-    for(int i=0;i<x.cols;++i)
-        EXPECT_EQ( 1, XHomogeneous(x.rows,i) );
-
-    
-    // Testing with doubles
-    Vec2d x2(4,3);
-    Vec3d X2;
-
-    euclideanToHomogeneous(x2,X2);
-
-    EXPECT_EQ( x2.rows+1, X2.rows );
-    EXPECT_EQ( 4, X2(0) );
-    EXPECT_EQ( 3, X2(1) );
-    EXPECT_EQ( 1, X2(2) );
-}
+/* namespace cv */

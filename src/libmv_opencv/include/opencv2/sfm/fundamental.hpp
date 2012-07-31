@@ -33,52 +33,43 @@
  *
  */
 
-#include "test_precomp.hpp"
-#include "opencv2/sfm/sfm.hpp"
+#ifndef __OPENCV_FUNDAMENTAL_HPP__
+#define __OPENCV_FUNDAMENTAL_HPP__
 
-using namespace cv;
-using namespace std;
+#ifdef __cplusplus
 
-TEST(Sfm_homogeneousToEuclidean, correctness)
+#include <opencv2/core/core.hpp>
+
+namespace cv
 {
-    Matx33f X(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
 
-    Matx23f XEuclidean;
-    homogeneousToEuclidean(X,XEuclidean);
+CV_EXPORTS
+void
+projectionsFromFundamental( const Mat &F,
+                            Mat &P1,
+                            Mat &P2 );
 
-    EXPECT_EQ( X.rows-1, XEuclidean.rows );
+CV_EXPORTS
+void
+fundamentalFromProjections( const Mat &P1,
+                            const Mat &P2,
+                            Mat &F );
 
-    for(int y=0;y<X.rows-1;++y)
-        for(int x=0;x<X.cols;++x)
-            if (X(X.rows-1,x)!=0)
-                EXPECT_LE( std::abs(X(y,x)/X(X.rows-1, x) - XEuclidean(y,x)), 1e-4 );
-}
+/**
+ * The normalized 8-point fundamental matrix solver.
+ * Reference: HZ2 11.2 pag.281 (x1 = x, x2 = x')
+ */
+CV_EXPORTS
+void
+normalizedEightPointSolver( const cv::Mat &x1,
+                            const cv::Mat &x2,
+                            cv::Mat &F );
 
-TEST(Sfm_euclideanToHomogeneous, correctness)
-{
-    // Testing with floats
-    Matx33f x(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
 
-    Matx43f XHomogeneous;
-    euclideanToHomogeneous(x,XHomogeneous);
+} /* namespace cv */
 
-    EXPECT_EQ( x.rows+1, XHomogeneous.rows );
-    for(int i=0;i<x.cols;++i)
-        EXPECT_EQ( 1, XHomogeneous(x.rows,i) );
+#endif /* __cplusplus */
 
-    
-    // Testing with doubles
-    Vec2d x2(4,3);
-    Vec3d X2;
+#endif
 
-    euclideanToHomogeneous(x2,X2);
-
-    EXPECT_EQ( x2.rows+1, X2.rows );
-    EXPECT_EQ( 4, X2(0) );
-    EXPECT_EQ( 3, X2(1) );
-    EXPECT_EQ( 1, X2(2) );
-}
+/* End of file. */

@@ -33,52 +33,36 @@
  *
  */
 
-#include "test_precomp.hpp"
-#include "opencv2/sfm/sfm.hpp"
+#ifndef __OPENCV_PROJECTION_HPP__
+#define __OPENCV_PROJECTION_HPP__
 
-using namespace cv;
-using namespace std;
+#ifdef __cplusplus
 
-TEST(Sfm_homogeneousToEuclidean, correctness)
+#include <opencv2/core/core.hpp>
+
+namespace cv
 {
-    Matx33f X(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
 
-    Matx23f XEuclidean;
-    homogeneousToEuclidean(X,XEuclidean);
+/** Converts point coordinates from homogeneous to euclidean pixel coordinates. E.g., ((x,y,z)->(x/z, y/z))
+* @param src Input vector of N-dimensional points
+* @param dst Output vector of N-1-dimensional points.
+*/
+CV_EXPORTS
+void
+homogeneousToEuclidean(InputArray src, OutputArray dst);
 
-    EXPECT_EQ( X.rows-1, XEuclidean.rows );
+/** Converts points from Euclidean to homogeneous space. E.g., ((x,y)->(x,y,1))
+* @param src Input vector of N-dimensional points
+* @param dst Output vector of N+1-dimensional points.
+*/
+CV_EXPORTS
+void
+euclideanToHomogeneous(InputArray src, OutputArray dst);
 
-    for(int y=0;y<X.rows-1;++y)
-        for(int x=0;x<X.cols;++x)
-            if (X(X.rows-1,x)!=0)
-                EXPECT_LE( std::abs(X(y,x)/X(X.rows-1, x) - XEuclidean(y,x)), 1e-4 );
-}
+} /* namespace cv */
 
-TEST(Sfm_euclideanToHomogeneous, correctness)
-{
-    // Testing with floats
-    Matx33f x(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
+#endif /* __cplusplus */
 
-    Matx43f XHomogeneous;
-    euclideanToHomogeneous(x,XHomogeneous);
+#endif
 
-    EXPECT_EQ( x.rows+1, XHomogeneous.rows );
-    for(int i=0;i<x.cols;++i)
-        EXPECT_EQ( 1, XHomogeneous(x.rows,i) );
-
-    
-    // Testing with doubles
-    Vec2d x2(4,3);
-    Vec3d X2;
-
-    euclideanToHomogeneous(x2,X2);
-
-    EXPECT_EQ( x2.rows+1, X2.rows );
-    EXPECT_EQ( 4, X2(0) );
-    EXPECT_EQ( 3, X2(1) );
-    EXPECT_EQ( 1, X2(2) );
-}
+/* End of file. */

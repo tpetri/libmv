@@ -34,12 +34,34 @@
  */
 
 #include "test_precomp.hpp"
-#include "opencv2/sfm/sfm.hpp"
+
+#include "libmv/multiview/conditioning.h"
 
 using namespace cv;
 using namespace std;
 
-TEST(Sfm_IsotropicScaling, correctness)
+TEST(Sfm_conditioning, normalizePoints) {
+    int n = 4;
+    Mat_<double> points(2, n);
+    points << 0, 0, 1, 1,
+              0, 2, 1, 3;
+
+    Mat T, normalized_points;
+    normalizePoints( points, normalized_points, T );
+
+    // ToDo (pablo): rewrite libmv::MeanAndVarianceAlongRows in order to avoid the next 'for' loop
+    Mat mean, std;
+    for( int i=0; i < 2; ++i )
+    {
+        meanStdDev(normalized_points.row(i), mean, std);
+
+        Mat variance = std * std;
+        EXPECT_NEAR(0, mean.at<double>(0), 1e-8);
+        EXPECT_NEAR(2, variance.at<double>(0), 1e-8);
+    }
+}
+
+TEST(Sfm_conditioning, normalizeIsotropicPoints)
 {
 
 }

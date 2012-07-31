@@ -33,52 +33,68 @@
  *
  */
 
-#include "test_precomp.hpp"
-#include "opencv2/sfm/sfm.hpp"
+#ifndef __OPENCV_CONDITIONING_HPP__
+#define __OPENCV_CONDITIONING_HPP__
 
-using namespace cv;
-using namespace std;
+#ifdef __cplusplus
 
-TEST(Sfm_homogeneousToEuclidean, correctness)
+#include <opencv2/core/core.hpp>
+
+namespace cv
 {
-    Matx33f X(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
 
-    Matx23f XEuclidean;
-    homogeneousToEuclidean(X,XEuclidean);
+/** Point conditioning (non isotropic)
+    Reference: HZ2 4.4.4 pag.109
+*/
+CV_EXPORTS
+void
+preconditionerFromPoints( const Mat &points,
+                          Mat &T );
 
-    EXPECT_EQ( X.rows-1, XEuclidean.rows );
+/** Point conditioning (isotropic)
+    Reference: HZ2 4.4.4 pag.107
+*/
+CV_EXPORTS
+void
+isotropicPreconditionerFromPoints( const Mat &points,
+                                    Mat &T );
 
-    for(int y=0;y<X.rows-1;++y)
-        for(int x=0;x<X.cols;++x)
-            if (X(X.rows-1,x)!=0)
-                EXPECT_LE( std::abs(X(y,x)/X(X.rows-1, x) - XEuclidean(y,x)), 1e-4 );
-}
+/** Apply Transformation to points such that transformed_points = T * points
+*/
+CV_EXPORTS
+void
+applyTransformationToPoints( const Mat &points,
+                              const Mat &T,
+                              Mat &transformed_points );
 
-TEST(Sfm_euclideanToHomogeneous, correctness)
-{
-    // Testing with floats
-    Matx33f x(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
+/** This function normalizes points (non isotropic)
+* @param X Input vector of N-dimensional points
+* @param x Output vector of the same N-dimensional points but with mean 0 and average norm sqrt(2)
+* @param T Output transform matrix such that x = T*X
+* Reference: HZ2 4.4.4 pag.109
+*/
+CV_EXPORTS
+void
+normalizePoints( const Mat &X,
+                  Mat &x,
+                  Mat &T );
 
-    Matx43f XHomogeneous;
-    euclideanToHomogeneous(x,XHomogeneous);
+/** This function normalizes points (isotropic)
+* @param X Input vector of N-dimensional points
+* @param x Output vector of the same N-dimensional points but with mean 0 and average norm sqrt(2)
+* @param T Output transform matrix such that x = T*X
+* Reference: HZ2 4.4.4 pag.107
+*/
+CV_EXPORTS
+void
+normalizeIsotropicPoints( const Mat &X,
+                          Mat &x,
+                          Mat &T );
 
-    EXPECT_EQ( x.rows+1, XHomogeneous.rows );
-    for(int i=0;i<x.cols;++i)
-        EXPECT_EQ( 1, XHomogeneous(x.rows,i) );
+} /* namespace cv */
 
-    
-    // Testing with doubles
-    Vec2d x2(4,3);
-    Vec3d X2;
+#endif /* __cplusplus */
 
-    euclideanToHomogeneous(x2,X2);
+#endif
 
-    EXPECT_EQ( x2.rows+1, X2.rows );
-    EXPECT_EQ( 4, X2(0) );
-    EXPECT_EQ( 3, X2(1) );
-    EXPECT_EQ( 1, X2(2) );
-}
+/* End of file. */

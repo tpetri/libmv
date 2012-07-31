@@ -1,3 +1,4 @@
+
 /*
  * Software License Agreement (BSD License)
  *
@@ -33,52 +34,64 @@
  *
  */
 
-#include "test_precomp.hpp"
-#include "opencv2/sfm/sfm.hpp"
+#include <opencv2/sfm/numeric.hpp>
 
-using namespace cv;
-using namespace std;
+#include "libmv/numeric/numeric.h"
+#include <opencv2/core/eigen.hpp>
 
-TEST(Sfm_homogeneousToEuclidean, correctness)
+#include <iostream>
+
+namespace cv
 {
-    Matx33f X(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
 
-    Matx23f XEuclidean;
-    homogeneousToEuclidean(X,XEuclidean);
+template<typename T>
+void
+meanAndVarianceAlongRows( const Mat_<T> &A,
+                          Mat &_mean,
+                          Mat &_variance )
+{
+    int n = A.rows;
+    int m = A.cols;
 
-    EXPECT_EQ( X.rows-1, XEuclidean.rows );
+    _mean.create( n, 1, A.type() );
+    _variance.create( n, 1, A.type() );
 
-    for(int y=0;y<X.rows-1;++y)
-        for(int x=0;x<X.cols;++x)
-            if (X(X.rows-1,x)!=0)
-                EXPECT_LE( std::abs(X(y,x)/X(X.rows-1, x) - XEuclidean(y,x)), 1e-4 );
+    Mat_<T> mean( _mean );
+    Mat_<T> variance( _variance );
+
+    for( int i = 0; i < n; ++i )
+    {
+        mean(i) = 0;
+        variance(i) = 0;
+
+        for( int j = 0; j < m; ++j )
+        {
+            T x = A(i,j);
+            mean(i) += x;
+            variance(i) += x*x;
+        }
+    }
+
+    mean /= m;
+    for (int i = 0; i < n; ++i) {
+        variance(i) = variance(i) / m - (mean(i)*mean(i));
+    }
 }
 
-TEST(Sfm_euclideanToHomogeneous, correctness)
+void
+meanAndVarianceAlongRows( const Mat &A,
+                          Mat &mean,
+                          Mat &variance )
 {
-    // Testing with floats
-    Matx33f x(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
-
-    Matx43f XHomogeneous;
-    euclideanToHomogeneous(x,XHomogeneous);
-
-    EXPECT_EQ( x.rows+1, XHomogeneous.rows );
-    for(int i=0;i<x.cols;++i)
-        EXPECT_EQ( 1, XHomogeneous(x.rows,i) );
-
-    
-    // Testing with doubles
-    Vec2d x2(4,3);
-    Vec3d X2;
-
-    euclideanToHomogeneous(x2,X2);
-
-    EXPECT_EQ( x2.rows+1, X2.rows );
-    EXPECT_EQ( 4, X2(0) );
-    EXPECT_EQ( 3, X2(1) );
-    EXPECT_EQ( 1, X2(2) );
+    int depth = A.depth();
+    if( depth == CV_32F )
+    {
+        meanAndVarianceAlongRows<float>( A, mean, variance );
+    }
+    else
+    {
+        meanAndVarianceAlongRows<double>( A, mean, variance );
+    }
 }
+
+} /* namespace cv */

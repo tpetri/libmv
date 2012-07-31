@@ -34,51 +34,40 @@
  */
 
 #include "test_precomp.hpp"
-#include "opencv2/sfm/sfm.hpp"
 
 using namespace cv;
 using namespace std;
 
-TEST(Sfm_homogeneousToEuclidean, correctness)
+
+template<typename T>
+static void
+test_meanAndVarianceAlongRows( void )
 {
-    Matx33f X(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
+    int n = 4;
+    Mat_<T> points(2,n);
+    points << 0, 0, 1, 1,
+              0, 2, 1, 3;
 
-    Matx23f XEuclidean;
-    homogeneousToEuclidean(X,XEuclidean);
+    Mat_<T> mean, variance;
+    meanAndVarianceAlongRows(points, mean, variance);
 
-    EXPECT_EQ( X.rows-1, XEuclidean.rows );
-
-    for(int y=0;y<X.rows-1;++y)
-        for(int x=0;x<X.cols;++x)
-            if (X(X.rows-1,x)!=0)
-                EXPECT_LE( std::abs(X(y,x)/X(X.rows-1, x) - XEuclidean(y,x)), 1e-4 );
+    EXPECT_NEAR(0.5, mean(0), 1e-8);
+    EXPECT_NEAR(1.5, mean(1), 1e-8);
+    EXPECT_NEAR(0.25, variance(0), 1e-8);
+    EXPECT_NEAR(1.25, variance(1), 1e-8);
 }
 
-TEST(Sfm_euclideanToHomogeneous, correctness)
+TEST(Sfm_numeric, meanAndVarianceAlongRows)
 {
-    // Testing with floats
-    Matx33f x(1, 2, 3,
-              4, 5, 6,
-              2, 1, 0);
-
-    Matx43f XHomogeneous;
-    euclideanToHomogeneous(x,XHomogeneous);
-
-    EXPECT_EQ( x.rows+1, XHomogeneous.rows );
-    for(int i=0;i<x.cols;++i)
-        EXPECT_EQ( 1, XHomogeneous(x.rows,i) );
-
-    
-    // Testing with doubles
-    Vec2d x2(4,3);
-    Vec3d X2;
-
-    euclideanToHomogeneous(x2,X2);
-
-    EXPECT_EQ( x2.rows+1, X2.rows );
-    EXPECT_EQ( 4, X2(0) );
-    EXPECT_EQ( 3, X2(1) );
-    EXPECT_EQ( 1, X2(2) );
+    for(unsigned iter=0; iter<2; ++iter)
+    {
+        if (iter==0)
+        {
+            test_meanAndVarianceAlongRows<float>();
+        }
+        else
+        {
+            test_meanAndVarianceAlongRows<double>();
+        }
+    }
 }

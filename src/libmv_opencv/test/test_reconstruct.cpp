@@ -45,11 +45,11 @@ check_projection_errors(const Mat& points3d_estimated, const vector<Mat>& projec
                         const vector<Mat>& points2d)
 {
   Mat X;
-  EuclideanToHomogeneous(points3d_estimated, X); // 3D point
+  euclideanToHomogeneous(points3d_estimated, X); // 3D point
   for (int m = 0; m < points2d.size(); ++m)
   {
     Mat x;
-    HomogeneousToEuclidean(projection_matrices_estimated[m] * X, x); // 2d projection
+    homogeneousToEuclidean(projection_matrices_estimated[m] * X, x); // 2d projection
     Mat projerr = points2d[m] - x;
 //    cout << projerr << endl;
     for (int n = 0; n < projerr.cols; ++n)
@@ -60,17 +60,18 @@ check_projection_errors(const Mat& points3d_estimated, const vector<Mat>& projec
   }
 }
 
-TEST(Sfm_reconstruct, twoViewProjective)
+TEST(Sfm_reconstruct, twoViewProjectiveOutliers)
 {
   int nviews = 2;
   int npoints = 50;
   bool is_projective = true;
+  bool has_outliers = true;
 
-  for(unsigned iter =0;iter<2;++iter)
+  for (unsigned iter = 1; iter < 2; ++iter)
   {
     int depth;
     float err_max2d, err_max3d;
-    if (iter==0)
+    if (iter == 0)
     {
       depth = CV_32F;
       err_max2d = 1e-5;
@@ -94,13 +95,12 @@ TEST(Sfm_reconstruct, twoViewProjective)
     Mat points3d_estimated;
     vector<Mat> Ps_estimated;
 
-    reconstruct(points2d, Ps_estimated, points3d_estimated, is_projective);
+    reconstruct(points2d, Ps_estimated, points3d_estimated, is_projective, has_outliers);
 
     /*  Check projection errors on GT*/
     check_projection_errors(points3d, Ps, points2d);
 
     /*  Check projection errors on estimates*/
-    // should this work for the  projective case??
     check_projection_errors(points3d_estimated, Ps_estimated, points2d);
   }
 }
