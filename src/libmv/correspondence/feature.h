@@ -21,6 +21,8 @@
 #ifndef LIBMV_CORRESPONDENCE_FEATURE_H_
 #define LIBMV_CORRESPONDENCE_FEATURE_H_
 
+#include <opencv2/features2d/features2d.hpp>
+
 #include "libmv/numeric/numeric.h"
 
 namespace libmv {
@@ -56,13 +58,6 @@ class PointFeature : public Feature {
   Vec2f coords;       // (x, y), i.e. (column, row).
   float scale;        // In pixels.
   float orientation;  // In radians.
-};
-
-class LineFeature : public Feature {
- public:
-  virtual ~LineFeature() {};
-  virtual const Vec2f &Point1() = 0;
-  virtual const Vec2f &Point2() = 0;
 };
 
 }  // namespace libmv
