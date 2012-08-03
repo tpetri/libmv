@@ -1,7 +1,7 @@
 FIND_PACKAGE( OpenCV REQUIRED )
 
 # define the source files
-SET(CORRESPONDENCE_SRC feature.cc 
+SET(CORRESPONDENCE_SRC 
                        matches.cc 
                        feature_matching.cc
 #                      feature_matching_FLANN.cc
@@ -9,8 +9,7 @@ SET(CORRESPONDENCE_SRC feature.cc
                        robust_tracker.cc
                        planar_tracker.cc
                        nRobustViewMatching.cc
-                       export_matches_txt.cc
-                       import_matches_txt.cc)
+)
 
 # define the header files (make the headers appear in IDEs.)
 FILE(GLOB CORRESPONDENCE_HDRS *.h)
@@ -28,7 +27,6 @@ LIBMV_INSTALL_LIB(correspondence)
             
 LIBMV_TEST(bipartite_graph "")
 LIBMV_TEST(kdtree "")
-LIBMV_TEST(feature_set "correspondence;image;numeric")
 LIBMV_TEST(matches "correspondence;image;numeric")
 LIBMV_TEST(Array_Matcher "correspondence;numeric;flann")
 # LIBMV_TEST(tracker "correspondence;reconstruction;numeric;flann")

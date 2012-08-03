@@ -23,8 +23,7 @@
 
 struct KeypointFeatureSet;
 #include <map>
-#include "libmv/detector/detector.h"
-#include "libmv/descriptor/descriptor.h"
+
 #include "libmv/correspondence/feature.h"
 #include "libmv/correspondence/matches.h"
 #include "libmv/correspondence/nViewMatchingInterface.h"
@@ -40,8 +39,8 @@ class nRobustViewMatching :public nViewMatchingInterface  {
   nRobustViewMatching();
   // Constructor (Specify a detector and a describer interface)
   // The class do not handle memory management over this two parameter.
-  nRobustViewMatching(detector::Detector * pDetector,
-                      descriptor::Describer * pDescriber);
+  nRobustViewMatching(cv::Ptr<cv::FeatureDetector> pDetector,
+                      cv::Ptr<cv::DescriptorExtractor> pDescriber);
   //TODO(pmoulon) Add a constructor with a Detector and a Descriptor
   // Add also a Template function to make the match robust..
   ~nRobustViewMatching(){};
@@ -128,9 +127,9 @@ private :
   Matches m_tracks;
 
   /// Interface to detect Keypoint.
-  detector::Detector * m_pDetector;
+  cv::Ptr<cv::FeatureDetector> m_pDetector;
   /// Interface to describe Keypoint.
-  descriptor::Describer * m_pDescriber;
+  cv::Ptr<cv::DescriptorExtractor> m_pDescriber;
 };
 
 } // namespace correspondence

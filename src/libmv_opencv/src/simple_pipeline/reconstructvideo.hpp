@@ -33,58 +33,33 @@
  *
  */
 
-#include "test_precomp.hpp"
+#ifndef __OPENCV_SIMPLE_PIPELINE_HPP__
+#define __OPENCV_SIMPLE_PIPELINE_HPP__
 
-using namespace cv;
-using namespace std;
+#ifdef __cplusplus
 
-/* Check projection errors */
-static void
-check_projection_errors(const Mat& X_estimated, const vector<Mat>& Ps,
-                        const vector<Mat>& xs, float err_max2d)
+#include <opencv2/sfm/sfm.hpp>
+#include <iostream.hpp>
+
+namespace cv
 {
-    Mat X;
-    euclideanToHomogeneous(X_estimated, X);   // 3D point
 
-    for (int m = 0; m < xs.size(); ++m)
-    {
-        Mat x;
-        homogeneousToEuclidean(Ps[m] * X, x); // 2d projection
-        Mat projerr = xs[m] - x;
+  /** Reconstructs scene from a given video sequence
+   * @param videofilename  The path and filename of the video file
+   * @param points3d Reconstructed 3D points
+   * @param K Recovered camera calibration matrices
+   * @param R Recovered camera rotation matrices
+   * @param t Recovered camera translations
+   */
+  CV_EXPORTS
+  void
+  reconstructVideo(InputArrayOfArrays track, OutputArray points3d, OutputArray K, OutputArrayOfArrays R,
+                   OutputArrayOfArrays t);
 
-        for (int n = 0; n < projerr.cols; ++n)
-        {
-            double d = cv::norm(projerr.col(n));
-            EXPECT_NEAR(0, d, err_max2d);
-        }
-    }
-}
+} /* namespace cv */
 
-static void
-test_twoViewProjectiveOutliers(int depth, float err_max2d)
-{
-    int nviews = 2;
-    int npoints = 50;
-    bool is_projective = true;
-    bool has_outliers = true;
+#endif /* __cplusplus */
 
-    vector<Mat> points2d, Rs, ts, Ps;
-    Mat K, points3d;
-    generateScene(nviews, npoints, is_projective, depth, K, Rs, ts, Ps, points3d, points2d);
+#endif
 
-    Mat points3d_estimated;
-    vector<Mat> Ps_estimated;
-    reconstruct(points2d, Ps_estimated, points3d_estimated, is_projective, has_outliers);
-
-    /* Check projection errors on GT */
-    check_projection_errors(points3d, Ps, points2d, err_max2d);
-
-    /* Check projection errors on estimates */
-    check_projection_errors(points3d_estimated, Ps_estimated, points2d, err_max2d);
-}
-
-TEST(Sfm_reconstruct, twoViewProjectiveOutliers)
-{
-    // test_twoViewProjectiveOutliers(CV_32F, 1e-5);
-    test_twoViewProjectiveOutliers(CV_64F, 1e-7);
-}
+/* End of file. */

@@ -28,8 +28,8 @@ namespace tracker {
 
 class RobustTracker : public Tracker {
  public:
-  RobustTracker(detector::Detector *detector, 
-                descriptor::Describer *describer,
+  RobustTracker(cv::Ptr<cv::FeatureDetector> detector,
+                  cv::Ptr<cv::DescriptorExtractor> describer,
                 correspondence::ArrayMatcher<float> *matcher) : 
                  Tracker(detector, describer, matcher) {
     minimum_number_inliers_ = 8; // from the 8 point algorithm

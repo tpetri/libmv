@@ -33,58 +33,24 @@
  *
  */
 
-#include "test_precomp.hpp"
+#include "reconstructvideo.hpp"
 
-using namespace cv;
-using namespace std;
-
-/* Check projection errors */
-static void
-check_projection_errors(const Mat& X_estimated, const vector<Mat>& Ps,
-                        const vector<Mat>& xs, float err_max2d)
+namespace cv
 {
-    Mat X;
-    euclideanToHomogeneous(X_estimated, X);   // 3D point
+  void
+    reconstructVideo(InputArrayOfArrays tracks, OutputArray points3d, OutputArray K, OutputArrayOfArrays R,
+                     OutputArrayOfArrays t)
+  {
 
-    for (int m = 0; m < xs.size(); ++m)
-    {
-        Mat x;
-        homogeneousToEuclidean(Ps[m] * X, x); // 2d projection
-        Mat projerr = xs[m] - x;
+    // Select key frames by looking at how key points change accross frames
 
-        for (int n = 0; n < projerr.cols; ++n)
-        {
-            double d = cv::norm(projerr.col(n));
-            EXPECT_NEAR(0, d, err_max2d);
-        }
-    }
-}
+    // Reconstruct key frames by taking 2 or 3? at a time -i.e 3D points and cameras
+    // Do BA
 
-static void
-test_twoViewProjectiveOutliers(int depth, float err_max2d)
-{
-    int nviews = 2;
-    int npoints = 50;
-    bool is_projective = true;
-    bool has_outliers = true;
+    // Resection to find cameras for intermediate frames
+    // Do BA
 
-    vector<Mat> points2d, Rs, ts, Ps;
-    Mat K, points3d;
-    generateScene(nviews, npoints, is_projective, depth, K, Rs, ts, Ps, points3d, points2d);
 
-    Mat points3d_estimated;
-    vector<Mat> Ps_estimated;
-    reconstruct(points2d, Ps_estimated, points3d_estimated, is_projective, has_outliers);
 
-    /* Check projection errors on GT */
-    check_projection_errors(points3d, Ps, points2d, err_max2d);
-
-    /* Check projection errors on estimates */
-    check_projection_errors(points3d_estimated, Ps_estimated, points2d, err_max2d);
-}
-
-TEST(Sfm_reconstruct, twoViewProjectiveOutliers)
-{
-    // test_twoViewProjectiveOutliers(CV_32F, 1e-5);
-    test_twoViewProjectiveOutliers(CV_64F, 1e-7);
-}
+  }
+} /* namespace cv */

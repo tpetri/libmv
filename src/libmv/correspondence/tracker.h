@@ -24,13 +24,14 @@
 #include <map>
 #include <list>
 
+#include <opencv2/features2d/features2d.hpp>
+
 #include "libmv/base/scoped_ptr.h"
 #include "libmv/base/vector.h"
 #include "libmv/correspondence/ArrayMatcher.h"
 #include "libmv/correspondence/feature_matching.h"
 #include "libmv/correspondence/matches.h"
-#include "libmv/descriptor/descriptor.h"
-#include "libmv/detector/detector.h"
+#include "libmv/image/image.h"
 
 namespace libmv {
 namespace tracker {
@@ -77,8 +78,8 @@ struct FeaturesGraph {
 // tracker as the previous position.
 class Tracker {
  public:
-  Tracker(detector::Detector *detector, 
-          descriptor::Describer *describer,
+  Tracker(cv::Ptr<cv::FeatureDetector> detector,
+           cv::Ptr<cv::DescriptorExtractor> describer,
           correspondence::ArrayMatcher<float> *matcher) : 
            detector_(detector),
            describer_(describer),
@@ -103,8 +104,8 @@ class Tracker {
                      bool keep_single_feature = true); 
 
  protected:
-   scoped_ptr<detector::Detector> detector_;
-   scoped_ptr<descriptor::Describer> describer_;
+  cv::Ptr<cv::FeatureDetector>  detector_;
+  cv::Ptr<cv::DescriptorExtractor> describer_;
    scoped_ptr<correspondence::ArrayMatcher<float> > matcher_;
 };
 

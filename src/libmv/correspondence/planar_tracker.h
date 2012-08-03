@@ -29,8 +29,8 @@ namespace tracker {
 // This class robustly tracks points that are in a plan.
 class PlanarTracker : public Tracker {
  public:
-  PlanarTracker(detector::Detector *detector, 
-              descriptor::Describer *describer,
+  PlanarTracker(cv::Ptr<cv::FeatureDetector> detector,
+                cv::Ptr<cv::DescriptorExtractor> describer,
               correspondence::ArrayMatcher<float> *matcher) : 
                Tracker(detector, describer, matcher) {
     minimum_number_inliers_ = 4; // at least 4 points are needed

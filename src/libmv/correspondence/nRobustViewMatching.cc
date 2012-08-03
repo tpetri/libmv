@@ -23,9 +23,6 @@
 #include "libmv/correspondence/feature.h"
 #include "libmv/correspondence/feature_matching.h"
 #include "libmv/correspondence/nRobustViewMatching.h"
-#include "libmv/descriptor/descriptor.h"
-#include "libmv/descriptor/vector_descriptor.h"
-#include "libmv/detector/detector.h"
 #include "libmv/image/image.h"
 #include "libmv/image/image_io.h"
 #include "libmv/image/image_converter.h"
@@ -36,13 +33,12 @@ using namespace correspondence;
 using namespace std;
 
 nRobustViewMatching::nRobustViewMatching(){
-   m_pDetector = NULL;
   m_pDescriber = NULL;
 }
 
 nRobustViewMatching::nRobustViewMatching(
-  detector::Detector * pDetector,
-  descriptor::Describer * pDescriber){
+    cv::Ptr<cv::FeatureDetector> pDetector,
+    cv::Ptr<cv::DescriptorExtractor> pDescriber){
   m_pDetector = pDetector;
   m_pDescriber = pDescriber;
 }
@@ -72,26 +68,31 @@ bool nRobustViewMatching::computeData(const string & filename)
       img_array = new Array3Du(imageTemp);      
     }
     Image im(img_array);
+    cv::Mat im_cv;
+    Image2Mat(im, im_cv);
 
     libmv::vector<libmv::Feature *> features;
-    m_pDetector->Detect( im, &features, NULL);
+    std::vector<cv::KeyPoint> features_cv;
+    m_pDetector->detect( im_cv, features_cv );
+    features.resize(features_cv.size());
+    for(size_t i=0; i<features_cv.size(); ++i)
+      features[i] = new libmv::PointFeature(features_cv[i]);
 
-    libmv::vector<descriptor::Descriptor *> descriptors;
-    m_pDescriber->Describe(features, im, NULL, &descriptors);
+    cv::Mat descriptors;
+    m_pDescriber->compute(im_cv, features_cv, descriptors);
 
     // Copy data.
     m_ViewData.insert( make_pair(filename,KeypointFeatureSet()) );
     KeypointFeatureSet & KeypointData = m_ViewData[filename];
-    KeypointData.features.resize(descriptors.size());
-    for(int i = 0;i < descriptors.size(); ++i)
+    KeypointData.features.resize(descriptors.rows);
+    for(int i = 0;i < descriptors.rows; ++i)
     {
       KeypointFeature & feat = KeypointData.features[i];
-      feat.descriptor = *(descriptor::VecfDescriptor*)descriptors[i];
+      descriptors.row(i).copyTo(feat.descriptor);
       *(PointFeature*)(&feat) = *(PointFeature*)features[i];
     }
 
     DeleteElements(&features);
-    DeleteElements(&descriptors);
 
     return true;
   }

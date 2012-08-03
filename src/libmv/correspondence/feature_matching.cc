@@ -38,7 +38,7 @@ void FindCandidateMatches(const KeypointFeatureSet &left,
       right.features.size() == 0 )  {
     return;
   }
-  int descriptorSize = left.features[0].descriptor.coords.size();
+  int descriptorSize = left.features[0].descriptor.cols;
 
   correspondence::ArrayMatcher<float> * pArrayMatcherA = NULL;
   correspondence::ArrayMatcher<float> * pArrayMatcherB = NULL;
@@ -121,7 +121,7 @@ float * KeypointFeatureSet::KeypointFeatureSetDescriptorsToContiguousArray
   if (featureSet.features.size() == 0)  {
     return NULL;
   }
-  int descriptorSize = featureSet.features[0].descriptor.coords.size();
+  int descriptorSize = featureSet.features[0].descriptor.cols;
   // Allocate and paste the necessary data.
   float * array = new float[featureSet.features.size()*descriptorSize];
 
@@ -144,7 +144,7 @@ void FindCandidateMatches_Ratio(const KeypointFeatureSet &left,
       right.features.size() == 0 )  {
     return;
   }
-  int descriptorSize = left.features[0].descriptor.coords.size();
+  int descriptorSize = left.features[0].descriptor.cols;
 
   correspondence::ArrayMatcher<float> * pArrayMatcherA = NULL;
   switch (eMatchMethod)
@@ -227,7 +227,7 @@ void FindCorrespondences(const KeypointFeatureSet &left,
       right.features.size() == 0 )  {
     return;
   }
-  int descriptorSize = left.features[0].descriptor.coords.size();
+  int descriptorSize = left.features[0].descriptor.cols;
 
   correspondence::ArrayMatcher<float> * pArrayMatcherA = NULL;
   switch (eMatchMethod)

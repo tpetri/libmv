@@ -33,63 +33,70 @@
  *
  */
 
-#include <opencv2/sfm/sfm.hpp>
+#include "test_precomp.hpp"
 
-namespace cv
+#include <fstream>
+#include <cstdlib>
+
+using namespace cv;
+using namespace std;
+
+
+/**
+ * 2D tracked points (dinosaur dataset)
+ * ------------------------------------
+ *
+ * The format is:
+ *
+ * row1 : x1 y1 x2 y2 ... x36 y36 for track 1
+ * row2 : x1 y1 x2 y2 ... x36 y36 for track 2
+ * etc
+ *
+ * i.e. a row gives the 2D measured position of a point as it is tracked
+ * through frames 1 to 36.  If there is no match found in a view then x
+ * and y are -1.
+ *
+ * Each row corresponds to a different point.  There are 4983 values.
+ *
+ */
+void vgg_2D_tracked_points_parser( Mat &_values )
 {
+    // Copy 'viff.xy.txt' file (2.4 MB) into "testdata/cv/sfm/" folder.
+    // Dinosaur dataset: http://www.robots.ox.ac.uk/~vgg/data/data-mview.html
+    string filename = string(TEST_DATA_DIR) + "viff.xy.txt"; 
+    ifstream file( filename.c_str() );
 
-  // Finds the skew matrix of a vector
-  // Reference: HZ2, p581, equation (A4.5)
-  void
-  skew(InputArray s_, OutputArray S)
-  {
-    cv::Mat s = s_.getMat();
-    cv::Mat A;
-
-    CV_Assert((s.type() == CV_64F) || (s.type() == CV_32F));
-
-    // double
-    if (s.type() == CV_64F)
+    Mat_<double> values(4983, 36*2);
+    string token;
+    for (int row = 0; getline(file, token); ++row)
     {
-      A.create(3, 3, CV_64F);
-      //    A=[0 -a(3) a(2); a(3) 0 -a(1); -a(2) a(1) 0];
-      A.at<double>(0, 0) = 0.0;
-      A.at<double>(0, 1) = -1.0 * s.at<double>(2, 0);
-      A.at<double>(0, 2) = s.at<double>(1, 0);
+        istringstream line(token);
 
-      A.at<double>(1, 0) = s.at<double>(2, 0);
-      A.at<double>(1, 1) = 0.0;
-      A.at<double>(1, 2) = -1 * s.at<double>(0, 0);
-
-      A.at<double>(2, 0) = -1.0 * s.at<double>(1, 0);
-      A.at<double>(2, 1) = s.at<double>(1, 0);
-      A.at<double>(2, 2) = 0.0;
-
+        int col = 0;
+        while (line >> token)
+        {
+            // cout << "row: " << row << " col: " << col << " Token :" << token << endl;
+            values(row, col) = atof(token.c_str());
+            col++;
+        }
+//         if (file.unget().get() == '\n')
+//         {
+//             // cout << "newline found" << endl;
+//         }
     }
 
-    //float
-    else
-    {
-      A.create(3, 3, CV_32F);
-      //    A=[0 -a(3) a(2); a(3) 0 -a(1); -a(2) a(1) 0];
-      A.at<float>(0, 0) = 0.0;
-      A.at<float>(0, 1) = -1.0 * s.at<float>(2, 0);
-      A.at<float>(0, 2) = s.at<float>(1, 0);
-
-      A.at<float>(1, 0) = s.at<float>(2, 0);
-      A.at<float>(1, 1) = 0.0;
-      A.at<float>(1, 2) = -1 * s.at<float>(0, 0);
-
-      A.at<float>(2, 0) = -1.0 * s.at<float>(1, 0);
-      A.at<float>(2, 1) = s.at<float>(1, 0);
-      A.at<float>(2, 2) = 0.0;
-
-    }
-
-    // Pack output
-    A.copyTo(S.getMatRef());
-
-  }
-
+    values.copyTo( _values );
 }
-/* namespace cv */
+
+
+TEST(Sfm_simple_pipeline, dinosaur)
+{
+    Mat_<double> values;
+    vgg_2D_tracked_points_parser( values );
+
+    EXPECT_DOUBLE_EQ( 197.44, values(4979,70));
+    EXPECT_DOUBLE_EQ( 260.19, values(4977,66));
+
+    // ToDo: complete the test
+//     FAIL();
+}

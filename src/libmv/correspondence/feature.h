@@ -44,6 +44,12 @@ class PointFeature : public Feature {
     orientation = 0.0;
   }
 
+  PointFeature(const cv::KeyPoint & keypoint) {
+    coords[0] = keypoint.pt.x;
+    coords[1] = keypoint.pt.y;
+    scale = keypoint.octave;
+    orientation = keypoint.angle;
+  }
   float x() const { return coords(0); }
   float y() const { return coords(1); }
 
