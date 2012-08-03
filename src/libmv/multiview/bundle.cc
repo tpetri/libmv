@@ -26,7 +26,7 @@
 #include "libmv/numeric/numeric.h"
 #include "libmv/logging/logging.h"
 #include "third_party/ssba/Math/v3d_linear.h"
-#include "third_party/ssba/Math/v3d_linear_utils.h"
+//#include "third_party/ssba/Math/v3d_linear_utils.h"
 #include "third_party/ssba/Geometry/v3d_metricbundle.h"
 
 namespace libmv {
@@ -341,7 +341,7 @@ double EuclideanBA(const vector<Mat2X> &x,
                       correspondingPoint);
 
   V3D::optimizerVerbosenessLevel = 0;
-  double const inlierThreshold = 2.0 / f0;
+  double const inlierThreshold = 1.0 / f0;
 
   Matrix3x3d K0 = cams[0].getIntrinsic();
   VLOG(3) << "K0 = "; displayMatrix(K0);
@@ -351,7 +351,7 @@ double EuclideanBA(const vector<Mat2X> &x,
                                            cams, Xs, measurements,
                                            correspondingView,
                                            correspondingPoint);
-  opt.maxIterations = 50;
+  opt.maxIterations = 1000;
   opt.minimize();
   VLOG(3) << "optimizer status = " << opt.status << std::endl;
   VLOG(3) << "refined K = "; displayMatrix(K0);

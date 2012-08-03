@@ -220,13 +220,13 @@ bool InitialReconstructionTwoViews(const Matches &matches,
                                                          recons);
   VLOG(2) << num_new_points << " points reconstructed." << std::endl;
   
-  ExportToBlenderScript(*recons, "init.py");
+//  ExportToBlenderScript(*recons, "init.py");
   
   // Performs projective bundle adjustment
   if (num_new_points > 0) {
     VLOG(2) << " -- Bundle adjustment --  " << std::endl;
     MetricBundleAdjust(matches_inliers, recons);
-    ExportToBlenderScript(*recons, "init-ba.py");
+    //ExportToBlenderScript(*recons, "init-ba.py");
     // TODO(julien) Remove outliers RemoveOutliers() + BA again
   }
   return is_good;
