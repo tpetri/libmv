@@ -156,7 +156,7 @@ uint PointStructureRetriangulationCalibrated(
       camera = dynamic_cast<PinholeCamera *>(
         reconstruction->GetCamera(fp.image()));
       if (camera) {
-        Ps.push_back(camera->projection_matrix()); 
+        Ps.push_back(precond * camera->projection_matrix()); 
         x << fp.feature()->x(), fp.feature()->y();
         xs.push_back(x);
       }
