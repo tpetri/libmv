@@ -27,7 +27,6 @@
 #include "libmv/base/vector.h"
 // TODO(julien) use the bipartite_graph_new.h now
 #include "libmv/correspondence/bipartite_graph.h"
-#include "libmv/logging/logging.h"
 #include "libmv/correspondence/feature.h"
 #include "libmv/numeric/numeric.h"
 
@@ -253,7 +252,7 @@ inline void TracksInAllImages(const Matches &matches,
     }
   }
   Intersect(&all_tracks);
-  CHECK(all_tracks.size() == 1);
+  assert(all_tracks.size() == 1);
   for (size_t i = 0; i < all_tracks[0].size(); ++i) {
     tracks->push_back(all_tracks[0][i]);
   }

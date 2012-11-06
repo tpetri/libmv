@@ -26,7 +26,7 @@ ENDIF (WIN32)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
   # TODO(julienr): fPIC should be added only when building as shared lib
-  SET(CMAKE_CXX_FLAGS "-fPIC -Wall -W -Wno-sign-compare -Wno-strict-aliasing -g -finline-functions -fgcse-sm -fgcse-las -ftracer -funroll-loops -fpredictive-commoning -ftree-vectorize -ftree-vectorizer-verbose=0")
+  SET(CMAKE_CXX_FLAGS "-march=native -msse4.1 -mfpmath=sse -fPIC -Wall -W -Wno-sign-compare -Wno-strict-aliasing -g -finline-functions -fgcse-sm -fgcse-las -ftracer -funroll-loops -fpredictive-commoning -ftree-vectorize -ftree-vectorizer-verbose=0")
   ADD_DEFINITIONS(-D_GNU_SOURCE)
 ENDIF(CMAKE_COMPILER_IS_GNUCXX)
 

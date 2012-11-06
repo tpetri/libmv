@@ -27,6 +27,7 @@
 #include "libmv/multiview/fundamental.h"
 #include "libmv/multiview/nviewtriangulation.h"
 #include "libmv/multiview/focal_from_fundamental.h"
+#include "libmv/logging/logging.h"
 
 namespace libmv {
 

@@ -23,7 +23,6 @@
 
 #include "libmv/camera/lens_distortion.h"
 #include "libmv/correspondence/feature.h"
-#include "libmv/logging/logging.h"
 #include "libmv/numeric/numeric.h"
 #include "libmv/multiview/projection.h"
 

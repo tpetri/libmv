@@ -20,6 +20,7 @@
 
 #include "robust_tracker.h"
 #include "libmv/multiview/robust_fundamental.h"
+#include "libmv/logging/logging.h"
 
 using namespace libmv;
 using namespace tracker;

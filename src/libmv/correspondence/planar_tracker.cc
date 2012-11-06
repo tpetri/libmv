@@ -20,6 +20,7 @@
 
 #include "planar_tracker.h"
 #include "libmv/multiview/robust_homography.h"
+#include "libmv/logging/logging.h"
 
 using namespace libmv;
 using namespace tracker;

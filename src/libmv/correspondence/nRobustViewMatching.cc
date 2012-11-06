@@ -27,6 +27,7 @@
 #include "libmv/image/image_io.h"
 #include "libmv/image/image_converter.h"
 #include "libmv/multiview/robust_fundamental.h"
+#include "libmv/logging/logging.h"
 
 using namespace libmv;
 using namespace correspondence;

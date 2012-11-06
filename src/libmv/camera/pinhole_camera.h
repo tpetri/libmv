@@ -24,7 +24,6 @@
 #include "libmv/camera/camera.h"
 #include "libmv/camera/lens_distortion.h"
 #include "libmv/correspondence/feature.h"
-#include "libmv/logging/logging.h"
 #include "libmv/numeric/numeric.h"
 #include "libmv/multiview/projection.h"
 
@@ -111,7 +110,7 @@ class PinholeCamera : public Camera {
     principal_point_(0) = intrinsic_matrix_(0, 2) ;
     principal_point_(1) = intrinsic_matrix_(1, 2) ;
 
-    CHECK(intrinsic_matrix_(1, 0) == 0 &&
+    assert(intrinsic_matrix_(1, 0) == 0 &&
           intrinsic_matrix_(2, 0) == 0 &&
           intrinsic_matrix_(2, 1) == 0);
 

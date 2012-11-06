@@ -72,7 +72,8 @@ namespace V3D
             {
                Vector<double> const& r = residual[k];
                double const e = norm_L2(r);
-               w[k] = (e < _inlierThreshold) ? 1.0 : sqrt(_inlierThreshold / e);
+               //w[k] = (e < _inlierThreshold) ? 1.0 : sqrt(_inlierThreshold / e); //pseudo something...
+	       w[k] = (e < _inlierThreshold) ? 1.0 : sqrt((2.*e - _inlierThreshold)*_inlierThreshold) / e; // huber weight
             } // end for (k)
          }
 

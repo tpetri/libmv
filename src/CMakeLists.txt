@@ -27,7 +27,7 @@ ENDIF (COMMAND cmake_policy)
 
 PROJECT(LIBMV C CXX)
 
-ENABLE_TESTING()
+#ENABLE_TESTING()
 
 SET(CMAKE_MODULE_PATH
   "${LIBMV_SOURCE_DIR}/CMake"
@@ -80,7 +80,6 @@ INCLUDE_DIRECTORIES(SYSTEM
   third_party/eigen
   third_party/eigen/unsupported
   third_party/ssba
-  third_party/glog/src
   third_party/OpenExif/src
   third_party/OpenExif/src/OpenExifJpeg
 )
@@ -102,6 +101,32 @@ IF (APPLE)
   )
 ENDIF (APPLE)
 
+
+find_package (Cholmod)
+
+
+MESSAGE("-- Check for Google Log")
+  FIND_LIBRARY(GLOG_LIB NAMES glog PATHS /usr/local/lib /usr/local/lib64)
+  IF (NOT EXISTS ${GLOG_LIB})
+    MESSAGE(FATAL_ERROR
+            "Can't find Google Log. Please specify: "
+            "-DGLOG_LIB=...")
+  ENDIF (NOT EXISTS ${GLOG_LIB})
+  MESSAGE("-- Found Google Log library: ${GLOG_LIB}")
+
+  FIND_PATH(GLOG_INCLUDE NAMES glog/logging.h PATHS /usr/local/include)
+  IF (NOT EXISTS ${GLOG_INCLUDE})
+    MESSAGE(FATAL_ERROR
+            "Can't find Google Log. Please specify: "
+            "-DGLOG_INCLUDE=...")
+  ENDIF (NOT EXISTS ${GLOG_INCLUDE})
+  MESSAGE("-- Found Google Log header in: ${GLOG_INCLUDE}")
+
+
+
+
+
+
 INCLUDE(Documentation)
 INCLUDE(Installation)
 INCLUDE(Testing)
@@ -109,20 +134,20 @@ INCLUDE(Testing)
 ADD_SUBDIRECTORY(libmv)
 ADD_SUBDIRECTORY(third_party)
 
-IF (BUILD_TESTS)
-  ADD_SUBDIRECTORY(testing)
-ENDIF (BUILD_TESTS)
+#IF (BUILD_TESTS)
+#  ADD_SUBDIRECTORY(testing)
+#ENDIF (BUILD_TESTS)
 
-OPTION(BUILD_GUI "Build Qt Tracker" ON)
-IF (BUILD_GUI)
- MESSAGE(STATUS "GUI enabled. Make sure you have Qt (and qt-devel for binary distributions)")
- ADD_SUBDIRECTORY(ui)
-ENDIF (BUILD_GUI)
+#OPTION(BUILD_GUI "Build Qt Tracker" ON)
+#IF (BUILD_GUI)
+# MESSAGE(STATUS "GUI enabled. Make sure you have Qt (and qt-devel for binary distributions)")
+# ADD_SUBDIRECTORY(ui)
+#ENDIF (BUILD_GUI)
 
-OPTION(BUILD_TOOLS "Build the command line tools." OFF)
-IF (BUILD_TOOLS)
-  ADD_SUBDIRECTORY(tools)
-ENDIF (BUILD_TOOLS)
+#OPTION(BUILD_TOOLS "Build the command line tools." OFF)
+#IF (BUILD_TOOLS)
+#  ADD_SUBDIRECTORY(tools)
+#ENDIF (BUILD_TOOLS)
 
 INCLUDE(Packaging)
 

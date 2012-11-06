@@ -10,7 +10,8 @@ add_definitions(-DV3DLIB_ENABLE_SUITESPARSE)
 
 include_directories(${V3D_INCLUDE_DIRS} ${EXTRA_INC_DIRS})
 include_directories(../ldl/Include)
-include_directories(../colamd/Include)
+#include_directories(../colamd/Include)
+include_directories(${CHOLMOD_INCLUDE_DIR})
 include_directories(../ufconfig)
 
 IF(CMAKE_COMPILER_IS_GNUCXX)

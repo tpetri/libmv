@@ -24,6 +24,7 @@
 #include "libmv/multiview/conditioning.h"
 #include "libmv/multiview/robust_fundamental.h"
 #include "libmv/multiview/robust_homography.h"
+#include "libmv/logging/logging.h"
 #include "libmv/reconstruction/image_selection.h"
 
 namespace libmv {

@@ -33,7 +33,7 @@
 
 #include "libmv/numeric/numeric.h"
 #include "libmv/numeric/function_derivative.h"
-#include "libmv/logging/logging.h"
+//#include "libmv/logging/logging.h"
 
 namespace libmv {
 
@@ -124,19 +124,19 @@ class LevenbergMarquardt {
     Parameters dx, x_new;
     int i;
     for (i = 0; results.status == RUNNING && i < params.max_iterations; ++i) {
-      VLOG(1) << "iteration: " << i;
-      VLOG(1) << "||f(x)||: " << f_(x).norm();
-      VLOG(1) << "max(g): " << g.array().abs().maxCoeff();
-      VLOG(1) << "u: " << u;
-      VLOG(1) << "v: " << v;
+      //VLOG(1) << "iteration: " << i;
+      //VLOG(1) << "||f(x)||: " << f_(x).norm();
+      //VLOG(1) << "max(g): " << g.array().abs().maxCoeff();
+      //VLOG(1) << "u: " << u;
+      //VLOG(1) << "v: " << v;
 
       AMatrixType A_augmented = A + u*AMatrixType::Identity(J.cols(), J.cols());
       Solver solver(A_augmented);
       dx = solver.solve(g);
       bool solved = (A_augmented * dx).isApprox(g);
-      if (!solved) {
-        LOG(ERROR) << "Failed to solve";
-      }
+//      if (!solved) {
+//        LOG(ERROR) << "Failed to solve";
+//      }
       if (solved && dx.norm() <= params.relative_step_threshold * x.norm()) {
         results.status = RELATIVE_STEP_SIZE_TOO_SMALL;
         break;

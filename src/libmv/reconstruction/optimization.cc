@@ -19,6 +19,7 @@
 // IN THE SOFTWARE.
 
 #include "libmv/multiview/bundle.h"
+#include "libmv/logging/logging.h"
 #include "libmv/reconstruction/optimization.h"
 #include "libmv/reconstruction/tools.h"
 

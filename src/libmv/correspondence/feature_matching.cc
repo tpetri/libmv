@@ -24,6 +24,7 @@
 #include "libmv/correspondence/ArrayMatcher_BruteForce.h"
 #include "libmv/correspondence/ArrayMatcher_Kdtree_Flann.h"
 #include "libmv/correspondence/ArrayMatcher_Kdtree.h"
+#include "libmv/logging/logging.h"
 
 namespace libmv {
 

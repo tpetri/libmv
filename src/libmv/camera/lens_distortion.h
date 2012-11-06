@@ -22,7 +22,6 @@
 #define LIBMV_CAMERA_LENS_DISTORTION_H_
 
 #include "libmv/base/vector.h"
-#include "libmv/logging/logging.h"
 #include "libmv/numeric/numeric.h"
 
 namespace libmv {

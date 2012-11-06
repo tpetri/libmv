@@ -21,7 +21,6 @@
 #ifndef LIBMV_MULTIVIEW_STRUCTURE_H_
 #define LIBMV_MULTIVIEW_STRUCTURE_H_
 
-#include "libmv/logging/logging.h"
 #include "libmv/numeric/numeric.h"
 #include "libmv/multiview/projection.h"
 

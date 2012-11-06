@@ -27,7 +27,6 @@
 #define LIBMV_MULTIVIEW_NVIEWTRIANGULATION_H
 
 #include "libmv/base/vector.h"
-#include "libmv/logging/logging.h"
 #include "libmv/numeric/numeric.h"
 
 namespace libmv {

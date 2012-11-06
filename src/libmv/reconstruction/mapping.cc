@@ -22,6 +22,8 @@
 #include "libmv/multiview/nviewtriangulation.h"
 #include "libmv/reconstruction/mapping.h"
 #include "libmv/reconstruction/tools.h"
+#include "libmv/logging/logging.h"
+
 
 namespace libmv {
 
